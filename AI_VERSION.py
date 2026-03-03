@@ -8,8 +8,14 @@ Approach: Graph Coloring using a distance-threshold model.
 - Score: min distance between same-frequency towers & average distance between same-frequency towers
 - Final hard score = min_dist * avg_dist
 
-NOTE: AI (Claude) was used to assist in structuring this solution. 
-The core logic (distance threshold determination, scoring metric design, 
+Distance metric: Haversine — accounts for Earth's curvature.
+Euclidean distance is inappropriate here because the input coordinates are
+lat/lon (degrees on a sphere), not a flat Cartesian plane. Haversine computes
+the great-circle distance between two points, giving accurate metre-level
+distances even for closely spaced towers.
+
+NOTE: AI (Claude) was used to assist in structuring this solution.
+The core logic (distance threshold determination, scoring metric design,
 graph-coloring with degree ordering) was reasoned through independently.
 """
 
@@ -19,39 +25,43 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 
-# ─── Data ────────────────────────────────────────────────────────────────────
+# ─── Data (lat, lon) ─────────────────────────────────────────────────────────
+# Stored as (lat, lon) decimal degrees — fed directly into Haversine.
 CELLS = {
-    'A': (536660, 183800), 'B': (537032, 184006), 'C': (537109, 183884),
-    'D': (537110, 184695), 'E': (537206, 184685), 'F': (537248, 185016),
-    'G': (537250, 185020), 'H': (537267, 184783), 'I': (537269, 183451),
-    'J': (537270, 184140), 'K': (537356, 184927), 'L': (537380, 184727),
-    'M': (537458, 184495), 'N': (537604, 184134), 'O': (537720, 184057),
-    'P': (537905, 184591), 'Q': (537910, 184441), 'R': (537953, 184295),
-    'S': (538050, 184245),
+    'A': (51.53657, -0.03098), 'B': (51.53833, -0.02554), 'C': (51.53721, -0.02448),
+    'D': (51.54450, -0.02415), 'E': (51.54439, -0.02277), 'F': (51.54735, -0.02204),
+    'G': (51.54739, -0.02201), 'H': (51.54525, -0.02185), 'I': (51.53328, -0.02234),
+    'J': (51.53948, -0.02206), 'K': (51.54653, -0.02052), 'L': (51.54472, -0.02025),
+    'M': (51.54262, -0.01921), 'N': (51.53934, -0.01725), 'O': (51.53862, -0.01561),
+    'P': (51.54337, -0.01273), 'Q': (51.54202, -0.01272), 'R': (51.54070, -0.01216),
+    'S': (51.54023, -0.01078),
 }
 
 FREQUENCIES = list(range(110, 116))  # 110..115
 
+EARTH_RADIUS_M = 6_371_000  # metres
+
 
 # ─── Distance helpers ─────────────────────────────────────────────────────────
-#def euclidean(a, b):
-#    return math.sqrt((a[0]-b[0])**2 + (a[1]-b[1])**2)
-
-def euclidean(p1, p2):
-    R = 6371000  # Earth radius in meters
-    lon1, lat1 = np.radians(p1)
-    lon2, lat2 = np.radians(p2)
+def haversine(a, b):
+    """
+    Great-circle distance in metres between two (lat, lon) points in degrees.
+    Formula: h = sin²(Δlat/2) + cos(lat1)·cos(lat2)·sin²(Δlon/2)
+             d = 2·R·arcsin(√h)
+    """
+    lat1, lon1 = math.radians(a[0]), math.radians(a[1])
+    lat2, lon2 = math.radians(b[0]), math.radians(b[1])
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
-    c = 2 * np.arcsin(np.sqrt(a))
-    return R * c
+    h = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+    return 2 * EARTH_RADIUS_M * math.asin(math.sqrt(h))
+
 
 def all_distances(cells):
     ids = list(cells.keys())
     dists = {}
     for i, j in itertools.combinations(ids, 2):
-        d = euclidean(cells[i], cells[j])
+        d = haversine(cells[i], cells[j])
         dists[(i, j)] = d
         dists[(j, i)] = d
     return dists
@@ -158,8 +168,8 @@ def plot_results(cells, assignment, neighbors, scores):
     ax1.set_title('Tower Interference Network\n(edges = interference risk)',
                   color='white', fontsize=13, pad=12)
 
-    xs = {k: v[0] for k, v in cells.items()}
-    ys = {k: v[1] for k, v in cells.items()}
+    xs = {k: v[1] for k, v in cells.items()}  # longitude
+    ys = {k: v[0] for k, v in cells.items()}  # latitude
 
     # Draw edges
     drawn = set()
@@ -172,16 +182,16 @@ def plot_results(cells, assignment, neighbors, scores):
                 drawn.add(key)
 
     # Draw nodes
-    for cell_id, (x, y) in cells.items():
+    for cell_id in cells:
         freq = assignment[cell_id]
         color = freq_color[freq]
-        ax1.scatter(x, y, color=color, s=280, zorder=3,
+        ax1.scatter(xs[cell_id], ys[cell_id], color=color, s=280, zorder=3,
                     edgecolors='white', linewidths=1.2)
-        ax1.text(x, y, cell_id, color='white', fontsize=8,
+        ax1.text(xs[cell_id], ys[cell_id], cell_id, color='white', fontsize=8,
                  ha='center', va='center', fontweight='bold', zorder=4)
 
-    ax1.set_xlabel('Easting', color='#aaaacc')
-    ax1.set_ylabel('Northing', color='#aaaacc')
+    ax1.set_xlabel('Longitude', color='#aaaacc')
+    ax1.set_ylabel('Latitude', color='#aaaacc')
     ax1.tick_params(colors='#aaaacc')
     for spine in ax1.spines.values():
         spine.set_edgecolor('#333355')

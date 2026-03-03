@@ -1,0 +1,49 @@
+Resource List + AI prompts
+------------------------------------------
+
+Literature -
+An Introduction to Statistical Learning, With Applications in Python (ISLP)
+
+Webistes - 
+https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html
+https://www.w3schools.com/python/numpy/numpy_array_filter.asp
+https://www.w3schools.com/python/numpy/numpy_creating_arrays.asp
+https://www.w3schools.com/python/numpy/numpy_intro.asp
+https://www.w3schools.com/python/matplotlib_scatter.asp
+https://www.geeksforgeeks.org/python/divide-all-elements-of-a-list-by-a-number-in-python/
+https://www.geeksforgeeks.org/python/enumerate-in-python/
+https://www.w3schools.com/python/python_lists_change.asp
+https://www.w3schools.com/python/numpy/numpy_array_sort.asp
+https://www.w3schools.com/python/numpy/numpy_array_iterating.asp
+https://www.geeksforgeeks.org/python/python-program-to-find-smallest-number-in-a-list/
+https://www.w3schools.com/python/python_dictionaries.asp
+https://www.geeksforgeeks.org/python/floor-ceil-function-python/
+https://www.geeksforgeeks.org/python/matplotlib-pyplot-scatter-in-python/
+https://www.geeksforgeeks.org/python/generating-random-number-list-in-python/
+https://gisgeography.com/easting-northing-coordinates/
+https://www.w3schools.com/python/numpy/numpy_array_indexing.asp
+https://www.geeksforgeeks.org/python/python-find-the-index-of-minimum-element-in-list/
+https://www.geeksforgeeks.org/python/python-min-function/
+https://en.wikipedia.org/wiki/Haversine_formula
+
+
+Claude prompts -
+
+* Attatched my code to the chat.
+"Given the code above, please clean the commments to make it look more presentable. DO NOT change the code, simply make it pretyy."
+-- Code returned as sent. 
+
+ #### I STILL DO HAVE THE OLD CODE IF YOU WOULD PREFER THAT
+
+
+*Given the documents sent to me with company name removed as well as AI restricitons removed.
+"Hi claude, i want to test you coding ability, so i will giev you a test, you need to write the answer in python. so the question is attatehced.
+
+i need your final answer to have two scores, the minimum distance between two points of the same label and then the avegare of the distances between all similar lables. these two score must also be multplied together to give you a final hard score. 
+
+finally you need to also create a graph with you answer"
+
+-- Code returned as well as visualization. 
+
+### This was not sent, however is avialable on my GitHub.
+

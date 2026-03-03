@@ -1,7 +1,5 @@
 # Cell Tower Frequency Allocation
 
-### Technical Assessment — BI & Development
-
 ---
 
 ## 1. Problem Definition
