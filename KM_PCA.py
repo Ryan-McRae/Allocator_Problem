@@ -1,4 +1,5 @@
 import random, math
+import time
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -179,17 +180,17 @@ def main():
     n = 10000
     top_score = 0
     top_seed = None
-
+    start = time.perf_counter()
     while n > 0:
         min_score, score_avg, total_score, seed, cluster_centroids, final_labels, outputs = allocator()
         if total_score > top_score:
             top_score = total_score
             top_seed = seed
         n -= 1
-
+    stop = time.perf_counter()
     # Re-run with the best seed found
     min_score, score_avg, total_score, seed, cluster_centroids, final_labels, outputs = allocator(top_seed)
-    print(f"Seed: {top_seed} | Min Score: {min_score:.4f} | Avg Score: {score_avg:.4f} | Total Score: {total_score:.4f}")
+    print(f"Seed: {top_seed} | Min Score: {min_score:.4f} | Avg Score: {score_avg:.4f} | Total Score: {total_score:.4f} | Time: {stop - start:0.4f}s")
 
     # Plotting
     plt.figure(figsize=(10, 8))
